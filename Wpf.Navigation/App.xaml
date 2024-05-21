@@ -1,0 +1,27 @@
+﻿<Application x:Class="Wpf.Navigation.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="clr-namespace:Wpf.Navigation.ViewsModels"
+             xmlns:viewsPages="clr-namespace:Wpf.Navigation.Views.Pages"
+             xmlns:viewsWindows="clr-namespace:Wpf.Navigation.Views.Windows"
+             >
+    <Application.Resources>
+
+        <DataTemplate DataType="{x:Type TypeName=viewModels:MainWindowsViewModel}">
+            <viewsWindows:MainWindow/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type TypeName=viewModels:HomeViewModel}">
+            <viewsPages:Home/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type TypeName=viewModels:SettingsViewModel}">
+            <viewsPages:Settings/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type TypeName=viewModels:UsersViewModels}">
+            <viewsPages:Users/>
+        </DataTemplate>
+
+    </Application.Resources>
+</Application>
