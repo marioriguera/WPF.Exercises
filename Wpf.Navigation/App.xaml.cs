@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System.Windows;
 using Wpf.Navigation.Services;
+using Wpf.Navigation.Views.Pages;
 using Wpf.Navigation.Views.Windows;
 using Wpf.Navigation.ViewsModels;
 
@@ -11,34 +13,52 @@ namespace Wpf.Navigation
     /// </summary>
     public partial class App : Application
     {
-        private ServiceProvider _serviceProvider;
+        private IHost _host;
 
         public App()
         {
             IServiceCollection services = new ServiceCollection();
 
-            // Dependencies injection
-            services.AddSingleton<INavigationService, NavigationService>();
-            services.AddSingleton(provider => new MainWindow
-            {
-                DataContext = provider.GetRequiredService<MainWindowsViewModel>(),
-            });
-            services.AddSingleton<MainWindowsViewModel>();
-            services.AddSingleton<HomeViewModel>();
-            services.AddSingleton<SettingsViewModel>();
-            services.AddSingleton<UsersViewModels>();
-            services.AddSingleton<NavigationService>();
+            _host = Host.CreateDefaultBuilder()
+                .ConfigureServices((context, services) =>
+                {
+                    // Register services
+                    services.AddSingleton<INavigationService, NavigationService>();
 
-            services.AddSingleton<Func<Type, BaseViewModel>>(serviceProvider => viewModelType => (BaseViewModel)serviceProvider.GetRequiredService(viewModelType));
+                    services.AddScoped(provider => new MainWindow
+                    {
+                        DataContext = provider.GetRequiredService<MainWindowsViewModel>(),
+                    });
 
-            _serviceProvider = services.BuildServiceProvider();
+                    // Register view models
+                    services.AddSingleton<MainWindowsViewModel>();
+                    services.AddSingleton<HomeViewModel>();
+                    services.AddSingleton<SettingsViewModel>();
+                    services.AddSingleton<UsersViewModel>();
+
+                    // Register views
+                    services.AddTransient<MainWindow>();
+                    services.AddTransient<Home>();
+                    services.AddTransient<Settings>();
+                    services.AddTransient<Users>();
+
+                    // Register functions
+                    services.AddSingleton<Func<Type, BaseViewModel>>(serviceProvider => viewModelType => (BaseViewModel)serviceProvider.GetRequiredService(viewModelType));
+                }).Build();
         }
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            var mainWindows = _serviceProvider.GetRequiredService<MainWindow>();
-            mainWindows.Show();
-            base.OnStartup(e);
+            var mainWindow = _host.Services.GetRequiredService<MainWindow>();
+            mainWindow.DataContext = _host.Services.GetRequiredService<MainWindowsViewModel>();
+            mainWindow.Show();
+        }
+
+        protected override async void OnExit(ExitEventArgs e)
+        {
+            await _host.StopAsync();
+            _host.Dispose();
+            base.OnExit(e);
         }
     }
 }

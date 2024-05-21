@@ -2,9 +2,9 @@
 
 namespace Wpf.Navigation.ViewsModels
 {
-    public class UsersViewModels : BaseViewModel
+    public class UsersViewModel : BaseViewModel
     {
-        public UsersViewModels(INavigationService navigationService)
+        public UsersViewModel(INavigationService navigationService)
             : base(navigationService)
         {
         }

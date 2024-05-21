@@ -23,7 +23,7 @@ namespace Wpf.Navigation.ViewsModels
 
         private void UsersNavigationFunction(object obj)
         {
-            Navigation.NavigateTo<UsersViewModels>();
+            Navigation.NavigateTo<UsersViewModel>();
         }
 
         private bool UsersNavigationCanExecute(object obj)

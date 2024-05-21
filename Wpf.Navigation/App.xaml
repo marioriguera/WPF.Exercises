@@ -19,7 +19,7 @@
             <viewsPages:Settings/>
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type TypeName=viewModels:UsersViewModels}">
+        <DataTemplate DataType="{x:Type TypeName=viewModels:UsersViewModel}">
             <viewsPages:Users/>
         </DataTemplate>
 
