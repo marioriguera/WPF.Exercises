@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Context;
 using System.Runtime.CompilerServices;
 
 namespace Wpf.Navigation.Services.Workers
@@ -18,11 +20,11 @@ namespace Wpf.Navigation.Services.Workers
         /// Initializes a new instance of the <see cref="CycleWorker"/> class.
         /// </summary>
         /// <param name="logger">The logger instance.</param>
-        public WorkerBase(/*ILogger<CycleWorker> logger*/)
+        public WorkerBase(ILogger<WorkerBase> logger)
         {
-            // Logger = logger;
-            // LogThreadName = $"{nameof(CycleWorker)} {Name} ";
-            // LogCycle = 0;
+            Logger = logger;
+            LogThreadName = $"{Name} ";
+            LogCycle = 0;
         }
 
         /// <summary>
@@ -60,7 +62,7 @@ namespace Wpf.Navigation.Services.Workers
         /// <summary>
         /// Gets the logger.
         /// </summary>
-        // private ILogger<CycleWorker> Logger { get; }
+        private ILogger<WorkerBase> Logger { get; }
 
         /// <summary>
         /// Triggerd when the application host is ready to start the service.
@@ -91,7 +93,7 @@ namespace Wpf.Navigation.Services.Workers
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             Task.Factory.StartNew(ThreadCycle, stoppingToken, TaskCreationOptions.LongRunning);
-            // LogTrace($"{Name} service started.");
+            LogTrace($"{Name} service started.");
 
             return Task.CompletedTask;
         }
@@ -115,269 +117,269 @@ namespace Wpf.Navigation.Services.Workers
         protected virtual Task CycleShutdown() => Task.CompletedTask;
 
         #region Logable Interface implementation
-        // 
-        // /// <summary>
-        // /// Formats and writes a critical log message and generates one critical message for every inner exception.
-        // /// </summary>
-        // /// /// <param name="ex">The exception to log.</param>
-        // /// <param name="message">
-        // /// <para>Format string of the log message in message template format. Example:</para>
-        // /// <para>"User {User} logged in from {Address}".</para>
-        // /// </param>
-        // /// <param name="memberName">The method or property name of the caller to the method.</param>
-        // protected void LogCriticalInner(Exception ex, string? message = null, [CallerMemberName] string memberName = "")
-        // {
-        //     using (LogContext.PushProperty("Cycle", LogCycle))
-        //     using (LogContext.PushProperty("Threadname", LogThreadName))
-        //     using (LogContext.PushProperty("Callername", memberName))
-        //     {
-        //         if (ex != null)
-        //         {
-        //             Log.Fatal(ex, string.IsNullOrWhiteSpace(message) ? ex.Message : message);
-        //         }
-        // 
-        //         Exception? inner = ex?.InnerException;
-        //         while (inner != null)
-        //         {
-        //             Log.Fatal(inner, inner.Message);
-        //             inner = inner.InnerException;
-        //         }
-        //     }
-        // }
-        // 
-        // /// <summary>
-        // /// Formats and writes a critical log message.
-        // /// </summary>
-        // /// <param name="message">
-        // /// <para>Format string of the log message in message template format. Example:</para>
-        // /// <para>"User {User} logged in from {Address}".</para>
-        // /// </param>
-        // /// <param name="memberName">The method or property name of the caller to the method.</param>
-        // /// <param name="args">An object array that contains zero or more objects to format.</param>
-        // protected void LogCritical(string message, [CallerMemberName] string memberName = "", params object[] args)
-        // {
-        //     using (LogContext.PushProperty("Cycle", LogCycle))
-        //     using (LogContext.PushProperty("Threadname", LogThreadName))
-        //     using (LogContext.PushProperty("Callername", memberName))
-        //     {
-        //         Logger.LogCritical(message, args);
-        //     }
-        // }
-        // 
-        // /// <summary>
-        // /// Formats and writes a critical log message.
-        // /// </summary>
-        // /// <param name="ex">The exception to log.</param>
-        // /// <param name="message">
-        // /// <para>Format string of the log message in message template format. Example:</para>
-        // /// <para>"User {User} logged in from {Address}".</para>
-        // /// </param>
-        // /// <param name="memberName">The method or property name of the caller to the method.</param>
-        // /// <param name="args">An object array that contains zero or more objects to format.</param>
-        // protected void LogCritical(Exception ex, string message, [CallerMemberName] string memberName = "", params object[] args)
-        // {
-        //     using (LogContext.PushProperty("Cycle", LogCycle))
-        //     using (LogContext.PushProperty("Threadname", LogThreadName))
-        //     using (LogContext.PushProperty("Callername", memberName))
-        //     {
-        //         Logger.LogCritical(ex, message, args);
-        //     }
-        // }
-        // 
-        // /// <summary>
-        // /// Formats and writes an error log message.
-        // /// </summary>
-        // /// <param name="message">
-        // /// <para>Format string of the log message in message template format. Example:</para>
-        // /// <para>"User {User} logged in from {Address}".</para>
-        // /// </param>
-        // /// <param name="memberName">The method or property name of the caller to the method.</param>
-        // /// <param name="args">An object array that contains zero or more objects to format.</param>
-        // protected void LogError(string message, [CallerMemberName] string memberName = "", params object[] args)
-        // {
-        //     using (LogContext.PushProperty("Cycle", LogCycle))
-        //     using (LogContext.PushProperty("Threadname", LogThreadName))
-        //     using (LogContext.PushProperty("Callername", memberName))
-        //     {
-        //         Logger.LogError(message, args);
-        //     }
-        // }
-        // 
-        // /// <summary>
-        // /// Formats and writes a error log message.
-        // /// </summary>
-        // /// <param name="ex">The exception to log.</param>
-        // /// <param name="message">
-        // /// <para>Format string of the log message in message template format. Example:</para>
-        // /// <para>"User {User} logged in from {Address}".</para>
-        // /// </param>
-        // /// <param name="memberName">The method or property name of the caller to the method.</param>
-        // /// <param name="args">An object array that contains zero or more objects to format.</param>
-        // protected void LogError(Exception ex, string message, [CallerMemberName] string memberName = "", params object[] args)
-        // {
-        //     using (LogContext.PushProperty("Cycle", LogCycle))
-        //     using (LogContext.PushProperty("Threadname", LogThreadName))
-        //     using (LogContext.PushProperty("Callername", memberName))
-        //     {
-        //         Logger.LogError(ex, message, args);
-        //     }
-        // }
-        // 
-        // /// <summary>
-        // /// Formats and writes a warning log message.
-        // /// </summary>
-        // /// <param name="message">
-        // /// <para>Format string of the log message in message template format. Example:</para>
-        // /// <para>"User {User} logged in from {Address}".</para>
-        // /// </param>
-        // /// <param name="memberName">The method or property name of the caller to the method.</param>
-        // /// <param name="args">An object array that contains zero or more objects to format.</param>
-        // protected void LogWarning(string message, [CallerMemberName] string memberName = "", params object[] args)
-        // {
-        //     using (LogContext.PushProperty("Cycle", LogCycle))
-        //     using (LogContext.PushProperty("Threadname", LogThreadName))
-        //     using (LogContext.PushProperty("Callername", memberName))
-        //     {
-        //         Logger.LogWarning(message, args);
-        //     }
-        // }
-        // 
-        // /// <summary>
-        // /// Formats and writes a warning log message.
-        // /// </summary>
-        // /// <param name="ex">The exception to log.</param>
-        // /// <param name="message">
-        // /// <para>Format string of the log message in message template format. Example:</para>
-        // /// <para>"User {User} logged in from {Address}".</para>
-        // /// </param>
-        // /// <param name="memberName">The method or property name of the caller to the method.</param>
-        // /// <param name="args">An object array that contains zero or more objects to format.</param>
-        // protected void LogWarning(Exception ex, string message, [CallerMemberName] string memberName = "", params object[] args)
-        // {
-        //     using (LogContext.PushProperty("Cycle", LogCycle))
-        //     using (LogContext.PushProperty("Threadname", LogThreadName))
-        //     using (LogContext.PushProperty("Callername", memberName))
-        //     {
-        //         Logger.LogWarning(ex, message, args);
-        //     }
-        // }
-        // 
-        // /// <summary>
-        // /// Formats and writes an informational log message.
-        // /// </summary>
-        // /// <param name="message">
-        // /// <para>Format string of the log message in message template format. Example:</para>
-        // /// <para>"User {User} logged in from {Address}".</para>
-        // /// </param>
-        // /// <param name="memberName">The method or property name of the caller to the method.</param>
-        // /// <param name="args">An object array that contains zero or more objects to format.</param>
-        // protected void LogInformation(string message, [CallerMemberName] string memberName = "", params object[] args)
-        // {
-        //     using (LogContext.PushProperty("Cycle", LogCycle))
-        //     using (LogContext.PushProperty("Threadname", LogThreadName))
-        //     using (LogContext.PushProperty("Callername", memberName))
-        //     {
-        //         Logger.LogInformation(message, args);
-        //     }
-        // }
-        // 
-        // /// <summary>
-        // /// Formats and writes an informational log message.
-        // /// </summary>
-        // /// <param name="ex">The exception to log.</param>
-        // /// <param name="message">
-        // /// <para>Format string of the log message in message template format. Example:</para>
-        // /// <para>"User {User} logged in from {Address}".</para>
-        // /// </param>
-        // /// <param name="memberName">The method or property name of the caller to the method.</param>
-        // /// <param name="args">An object array that contains zero or more objects to format.</param>
-        // protected void LogInformation(Exception ex, string message, [CallerMemberName] string memberName = "", params object[] args)
-        // {
-        //     using (LogContext.PushProperty("Cycle", LogCycle))
-        //     using (LogContext.PushProperty("Threadname", LogThreadName))
-        //     using (LogContext.PushProperty("Callername", memberName))
-        //     {
-        //         Logger.LogInformation(ex, message, args);
-        //     }
-        // }
-        // 
-        // /// <summary>
-        // /// Formats and writes a debug log message.
-        // /// </summary>
-        // /// <param name="message">
-        // /// <para>Format string of the log message in message template format. Example:</para>
-        // /// <para>"User {User} logged in from {Address}".</para>
-        // /// </param>
-        // /// <param name="memberName">The method or property name of the caller to the method.</param>
-        // /// <param name="args">An object array that contains zero or more objects to format.</param>
-        // protected void LogDebug(string message, [CallerMemberName] string memberName = "", params object[] args)
-        // {
-        //     using (LogContext.PushProperty("Cycle", LogCycle))
-        //     using (LogContext.PushProperty("Threadname", LogThreadName))
-        //     using (LogContext.PushProperty("Callername", memberName))
-        //     {
-        //         Logger.LogDebug(message, args);
-        //     }
-        // }
-        // 
-        // /// <summary>
-        // /// Formats and writes a debug log message.
-        // /// </summary>
-        // /// <param name="ex">The exception to log.</param>
-        // /// <param name="message">
-        // /// <para>Format string of the log message in message template format. Example:</para>
-        // /// <para>"User {User} logged in from {Address}".</para>
-        // /// </param>
-        // /// <param name="memberName">The method or property name of the caller to the method.</param>
-        // /// <param name="args">An object array that contains zero or more objects to format.</param>
-        // protected void LogDebug(Exception ex, string message, [CallerMemberName] string memberName = "", params object[] args)
-        // {
-        //     using (LogContext.PushProperty("Cycle", LogCycle))
-        //     using (LogContext.PushProperty("Threadname", LogThreadName))
-        //     using (LogContext.PushProperty("Callername", memberName))
-        //     {
-        //         Logger.LogDebug(ex, message, args);
-        //     }
-        // }
-        // 
-        // /// <summary>
-        // /// Formats and writes a trace log message.
-        // /// </summary>
-        // /// <param name="message">
-        // /// <para>Format string of the log message in message template format. Example:</para>
-        // /// <para>"User {User} logged in from {Address}".</para>
-        // /// </param>
-        // /// <param name="memberName">The method or property name of the caller to the method.</param>
-        // /// <param name="args">An object array that contains zero or more objects to format.</param>
-        // protected void LogTrace(string message, [CallerMemberName] string memberName = "", params object[] args)
-        // {
-        //     using (LogContext.PushProperty("Cycle", LogCycle))
-        //     using (LogContext.PushProperty("Threadname", LogThreadName))
-        //     using (LogContext.PushProperty("Callername", memberName))
-        //     {
-        //         Logger.LogTrace(message, args);
-        //     }
-        // }
-        // 
-        // /// <summary>
-        // /// Formats and writes a trace log message.
-        // /// </summary>
-        // /// <param name="ex">The exception to log.</param>
-        // /// <param name="message">
-        // /// <para>Format string of the log message in message template format. Example:</para>
-        // /// <para>"User {User} logged in from {Address}".</para>
-        // /// </param>
-        // /// <param name="memberName">The method or property name of the caller to the method.</param>
-        // /// <param name="args">An object array that contains zero or more objects to format.</param>
-        // protected void LogTrace(Exception ex, string message, [CallerMemberName] string memberName = "", params object[] args)
-        // {
-        //     using (LogContext.PushProperty("Cycle", LogCycle))
-        //     using (LogContext.PushProperty("Threadname", LogThreadName))
-        //     using (LogContext.PushProperty("Callername", memberName))
-        //     {
-        //         Logger.LogTrace(ex, message, args);
-        //     }
-        // }
+
+        /// <summary>
+        /// Formats and writes a critical log message and generates one critical message for every inner exception.
+        /// </summary>
+        /// /// <param name="ex">The exception to log.</param>
+        /// <param name="message">
+        /// <para>Format string of the log message in message template format. Example:</para>
+        /// <para>"User {User} logged in from {Address}".</para>
+        /// </param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        protected void LogCriticalInner(Exception ex, string? message = null, [CallerMemberName] string memberName = "")
+        {
+            using (LogContext.PushProperty("Cycle", LogCycle))
+            using (LogContext.PushProperty("Threadname", LogThreadName))
+            using (LogContext.PushProperty("Callername", memberName))
+            {
+                if (ex != null)
+                {
+                    Log.Fatal(ex, string.IsNullOrWhiteSpace(message) ? ex.Message : message);
+                }
+
+                Exception? inner = ex?.InnerException;
+                while (inner != null)
+                {
+                    Log.Fatal(inner, inner.Message);
+                    inner = inner.InnerException;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Formats and writes a critical log message.
+        /// </summary>
+        /// <param name="message">
+        /// <para>Format string of the log message in message template format. Example:</para>
+        /// <para>"User {User} logged in from {Address}".</para>
+        /// </param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="args">An object array that contains zero or more objects to format.</param>
+        protected void LogCritical(string message, [CallerMemberName] string memberName = "", params object[] args)
+        {
+            using (LogContext.PushProperty("Cycle", LogCycle))
+            using (LogContext.PushProperty("Threadname", LogThreadName))
+            using (LogContext.PushProperty("Callername", memberName))
+            {
+                Logger.LogCritical(message, args);
+            }
+        }
+
+        /// <summary>
+        /// Formats and writes a critical log message.
+        /// </summary>
+        /// <param name="ex">The exception to log.</param>
+        /// <param name="message">
+        /// <para>Format string of the log message in message template format. Example:</para>
+        /// <para>"User {User} logged in from {Address}".</para>
+        /// </param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="args">An object array that contains zero or more objects to format.</param>
+        protected void LogCritical(Exception ex, string message, [CallerMemberName] string memberName = "", params object[] args)
+        {
+            using (LogContext.PushProperty("Cycle", LogCycle))
+            using (LogContext.PushProperty("Threadname", LogThreadName))
+            using (LogContext.PushProperty("Callername", memberName))
+            {
+                Logger.LogCritical(ex, message, args);
+            }
+        }
+
+        /// <summary>
+        /// Formats and writes an error log message.
+        /// </summary>
+        /// <param name="message">
+        /// <para>Format string of the log message in message template format. Example:</para>
+        /// <para>"User {User} logged in from {Address}".</para>
+        /// </param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="args">An object array that contains zero or more objects to format.</param>
+        protected void LogError(string message, [CallerMemberName] string memberName = "", params object[] args)
+        {
+            using (LogContext.PushProperty("Cycle", LogCycle))
+            using (LogContext.PushProperty("Threadname", LogThreadName))
+            using (LogContext.PushProperty("Callername", memberName))
+            {
+                Logger.LogError(message, args);
+            }
+        }
+
+        /// <summary>
+        /// Formats and writes a error log message.
+        /// </summary>
+        /// <param name="ex">The exception to log.</param>
+        /// <param name="message">
+        /// <para>Format string of the log message in message template format. Example:</para>
+        /// <para>"User {User} logged in from {Address}".</para>
+        /// </param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="args">An object array that contains zero or more objects to format.</param>
+        protected void LogError(Exception ex, string message, [CallerMemberName] string memberName = "", params object[] args)
+        {
+            using (LogContext.PushProperty("Cycle", LogCycle))
+            using (LogContext.PushProperty("Threadname", LogThreadName))
+            using (LogContext.PushProperty("Callername", memberName))
+            {
+                Logger.LogError(ex, message, args);
+            }
+        }
+
+        /// <summary>
+        /// Formats and writes a warning log message.
+        /// </summary>
+        /// <param name="message">
+        /// <para>Format string of the log message in message template format. Example:</para>
+        /// <para>"User {User} logged in from {Address}".</para>
+        /// </param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="args">An object array that contains zero or more objects to format.</param>
+        protected void LogWarning(string message, [CallerMemberName] string memberName = "", params object[] args)
+        {
+            using (LogContext.PushProperty("Cycle", LogCycle))
+            using (LogContext.PushProperty("Threadname", LogThreadName))
+            using (LogContext.PushProperty("Callername", memberName))
+            {
+                Logger.LogWarning(message, args);
+            }
+        }
+
+        /// <summary>
+        /// Formats and writes a warning log message.
+        /// </summary>
+        /// <param name="ex">The exception to log.</param>
+        /// <param name="message">
+        /// <para>Format string of the log message in message template format. Example:</para>
+        /// <para>"User {User} logged in from {Address}".</para>
+        /// </param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="args">An object array that contains zero or more objects to format.</param>
+        protected void LogWarning(Exception ex, string message, [CallerMemberName] string memberName = "", params object[] args)
+        {
+            using (LogContext.PushProperty("Cycle", LogCycle))
+            using (LogContext.PushProperty("Threadname", LogThreadName))
+            using (LogContext.PushProperty("Callername", memberName))
+            {
+                Logger.LogWarning(ex, message, args);
+            }
+        }
+
+        /// <summary>
+        /// Formats and writes an informational log message.
+        /// </summary>
+        /// <param name="message">
+        /// <para>Format string of the log message in message template format. Example:</para>
+        /// <para>"User {User} logged in from {Address}".</para>
+        /// </param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="args">An object array that contains zero or more objects to format.</param>
+        protected void LogInformation(string message, [CallerMemberName] string memberName = "", params object[] args)
+        {
+            using (LogContext.PushProperty("Cycle", LogCycle))
+            using (LogContext.PushProperty("Threadname", LogThreadName))
+            using (LogContext.PushProperty("Callername", memberName))
+            {
+                Logger.LogInformation(message, args);
+            }
+        }
+
+        /// <summary>
+        /// Formats and writes an informational log message.
+        /// </summary>
+        /// <param name="ex">The exception to log.</param>
+        /// <param name="message">
+        /// <para>Format string of the log message in message template format. Example:</para>
+        /// <para>"User {User} logged in from {Address}".</para>
+        /// </param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="args">An object array that contains zero or more objects to format.</param>
+        protected void LogInformation(Exception ex, string message, [CallerMemberName] string memberName = "", params object[] args)
+        {
+            using (LogContext.PushProperty("Cycle", LogCycle))
+            using (LogContext.PushProperty("Threadname", LogThreadName))
+            using (LogContext.PushProperty("Callername", memberName))
+            {
+                Logger.LogInformation(ex, message, args);
+            }
+        }
+
+        /// <summary>
+        /// Formats and writes a debug log message.
+        /// </summary>
+        /// <param name="message">
+        /// <para>Format string of the log message in message template format. Example:</para>
+        /// <para>"User {User} logged in from {Address}".</para>
+        /// </param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="args">An object array that contains zero or more objects to format.</param>
+        protected void LogDebug(string message, [CallerMemberName] string memberName = "", params object[] args)
+        {
+            using (LogContext.PushProperty("Cycle", LogCycle))
+            using (LogContext.PushProperty("Threadname", LogThreadName))
+            using (LogContext.PushProperty("Callername", memberName))
+            {
+                Logger.LogDebug(message, args);
+            }
+        }
+
+        /// <summary>
+        /// Formats and writes a debug log message.
+        /// </summary>
+        /// <param name="ex">The exception to log.</param>
+        /// <param name="message">
+        /// <para>Format string of the log message in message template format. Example:</para>
+        /// <para>"User {User} logged in from {Address}".</para>
+        /// </param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="args">An object array that contains zero or more objects to format.</param>
+        protected void LogDebug(Exception ex, string message, [CallerMemberName] string memberName = "", params object[] args)
+        {
+            using (LogContext.PushProperty("Cycle", LogCycle))
+            using (LogContext.PushProperty("Threadname", LogThreadName))
+            using (LogContext.PushProperty("Callername", memberName))
+            {
+                Logger.LogDebug(ex, message, args);
+            }
+        }
+
+        /// <summary>
+        /// Formats and writes a trace log message.
+        /// </summary>
+        /// <param name="message">
+        /// <para>Format string of the log message in message template format. Example:</para>
+        /// <para>"User {User} logged in from {Address}".</para>
+        /// </param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="args">An object array that contains zero or more objects to format.</param>
+        protected void LogTrace(string message, [CallerMemberName] string memberName = "", params object[] args)
+        {
+            using (LogContext.PushProperty("Cycle", LogCycle))
+            using (LogContext.PushProperty("Threadname", LogThreadName))
+            using (LogContext.PushProperty("Callername", memberName))
+            {
+                Logger.LogTrace(message, args);
+            }
+        }
+
+        /// <summary>
+        /// Formats and writes a trace log message.
+        /// </summary>
+        /// <param name="ex">The exception to log.</param>
+        /// <param name="message">
+        /// <para>Format string of the log message in message template format. Example:</para>
+        /// <para>"User {User} logged in from {Address}".</para>
+        /// </param>
+        /// <param name="memberName">The method or property name of the caller to the method.</param>
+        /// <param name="args">An object array that contains zero or more objects to format.</param>
+        protected void LogTrace(Exception ex, string message, [CallerMemberName] string memberName = "", params object[] args)
+        {
+            using (LogContext.PushProperty("Cycle", LogCycle))
+            using (LogContext.PushProperty("Threadname", LogThreadName))
+            using (LogContext.PushProperty("Callername", memberName))
+            {
+                Logger.LogTrace(ex, message, args);
+            }
+        }
         #endregion
 
         /// <summary>
@@ -390,51 +392,50 @@ namespace Wpf.Navigation.Services.Workers
 
             token.WaitHandle.WaitOne(StartDelay);
 
-            // LogTrace($"Starts initialization.");
+            LogTrace($"Starts initialization.");
 
             await CycleInitialization();
 
-            // LogTrace($"Initialization completed.");
+            LogTrace($"Initialization completed.");
 
             // WorkerReport wr = new WorkerReport(Name, Interval);
-
             while (!token.IsCancellationRequested)
             {
-                DateTime start = DateTime.UtcNow;
-                DateTime end = DateTime.UtcNow;
+                // To statistics worker implementation.
+                // DateTime start = DateTime.UtcNow;
+                // DateTime end = DateTime.UtcNow;
                 try
                 {
                     LogCycle++;
 
-                    // LogInformation($"Cycle start.");
+                    LogInformation($"Cycle start.");
 
                     await CycleWork();
 
-                    // LogInformation($"Cycle end.");
+                    LogInformation($"Cycle end.");
 
-                    // LogTrace($"Sleep {Interval}");
+                    LogTrace($"Sleep {Interval}");
 
                     // Add statistics
-                    end = DateTime.UtcNow;
+                    // end = DateTime.UtcNow;
                     // wr.AddCycleStatistics(start, end);
-
                     token.WaitHandle.WaitOne(Interval);
                 }
                 catch (Exception ex)
                 {
-                    // LogCriticalInner(ex, $"Unexpected exception inside worker cycle: {ex.Message}");
+                    LogCriticalInner(ex, $"Unexpected exception inside worker cycle: {ex.Message}");
 
                     // Add statistics
-                    end = DateTime.UtcNow;
+                    // end = DateTime.UtcNow;
                     // wr.AddCycleStatistics(start, end, ex);
                 }
             }
 
-            // LogTrace($"Starts shutdown.");
+            LogTrace($"Starts shutdown.");
 
             await CycleShutdown();
 
-            // LogTrace($"Shutdown completed.");
+            LogTrace($"Shutdown completed.");
         }
     }
 }

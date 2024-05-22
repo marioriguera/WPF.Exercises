@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Wpf.Navigation.Services;
 using Wpf.Navigation.Services.Workers.Home;
 using Wpf.Navigation.Views.Pages;
@@ -12,6 +13,22 @@ namespace Wpf.Navigation.Dependencies
     /// </summary>
     public static class Register
     {
+        /// <summary>
+        /// Configures the host options for graceful shutdown and exception handling.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to add the host options to.</param>
+        /// <returns>The <see cref="IServiceCollection"/> with host options configured.</returns>
+        public static IServiceCollection AddHostOptions(this IServiceCollection services)
+        {
+            services.Configure<HostOptions>(options =>
+            {
+                options.ShutdownTimeout = TimeSpan.FromSeconds(30); // Wait 30 seconds on gracefull shutdown.
+                options.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.StopHost; // stop host on hosted services exception.
+            });
+
+            return services;
+        }
+
         /// <summary>
         /// Adds the application's dependencies to the specified IServiceCollection.
         /// </summary>
@@ -45,6 +62,11 @@ namespace Wpf.Navigation.Dependencies
             return services;
         }
 
+        /// <summary>
+        /// Adds hosted services (background workers) to the service collection.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to add the hosted services to.</param>
+        /// <returns>The <see cref="IServiceCollection"/> with hosted services added.</returns>
         public static IServiceCollection AddWorkers(this IServiceCollection services)
         {
             services.AddHostedService<HomeWorker>();

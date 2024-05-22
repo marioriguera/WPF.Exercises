@@ -4,6 +4,7 @@
              xmlns:viewModels="clr-namespace:Wpf.Navigation.ViewsModels"
              xmlns:viewsPages="clr-namespace:Wpf.Navigation.Views.Pages"
              xmlns:viewsWindows="clr-namespace:Wpf.Navigation.Views.Windows"
+             ShutdownMode="OnMainWindowClose"
              >
     <Application.Resources>
 

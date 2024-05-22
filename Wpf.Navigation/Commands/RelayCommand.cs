@@ -35,10 +35,7 @@ namespace Wpf.Navigation.Commands
         /// <param name="execute">The execution logic.</param>
         public RelayCommand(Predicate<T> canExecute, Action<T> execute)
         {
-            if (execute == null)
-            {
-                throw new ArgumentNullException("execute");
-            }
+            ArgumentNullException.ThrowIfNull(execute, nameof(execute));
 
             _execute = execute;
             _canExecute = canExecute;
