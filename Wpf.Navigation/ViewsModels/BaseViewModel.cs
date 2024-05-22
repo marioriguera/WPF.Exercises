@@ -1,4 +1,5 @@
-﻿using Wpf.Navigation.Commands;
+﻿using System.Windows;
+using Wpf.Navigation.Commands;
 using Wpf.Navigation.Models;
 using Wpf.Navigation.Services;
 
@@ -20,6 +21,18 @@ namespace Wpf.Navigation.ViewsModels
         public RelayCommand<object> HomeNavigateCommand { get; init; }
         public RelayCommand<object> SettingsNavigateCommand { get; init; }
         public RelayCommand<object> UsersNavigateCommand { get; init; }
+
+        protected void RunOnUiThread(Action action)
+        {
+            if (Application.Current.Dispatcher.CheckAccess())
+            {
+                action();
+            }
+            else
+            {
+                Application.Current.Dispatcher.Invoke(action);
+            }
+        }
 
         private void UsersNavigationFunction(object obj)
         {

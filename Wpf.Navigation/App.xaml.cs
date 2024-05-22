@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Windows;
-using Wpf.Navigation.Services;
-using Wpf.Navigation.Views.Pages;
+using Wpf.Navigation.Dependencies;
 using Wpf.Navigation.Views.Windows;
 using Wpf.Navigation.ViewsModels;
 
@@ -13,40 +12,33 @@ namespace Wpf.Navigation
     /// </summary>
     public partial class App : Application
     {
-        private IHost _host;
+        private readonly IHost _host;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="App"/> class.
+        /// </summary>
         public App()
         {
-            IServiceCollection services = new ServiceCollection();
-
             _host = Host.CreateDefaultBuilder()
                 .ConfigureServices((context, services) =>
                 {
-                    // Register services
-                    services.AddSingleton<INavigationService, NavigationService>();
-
-                    services.AddScoped(provider => new MainWindow
+                    services.Configure<HostOptions>(options =>
                     {
-                        DataContext = provider.GetRequiredService<MainWindowsViewModel>(),
+                        options.ShutdownTimeout = TimeSpan.FromSeconds(30); // Wait 30 seconds on gracefull shutdown.
+                        options.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.StopHost; // stop host on hosted services exception.
                     });
 
-                    // Register view models
-                    services.AddSingleton<MainWindowsViewModel>();
-                    services.AddSingleton<HomeViewModel>();
-                    services.AddSingleton<SettingsViewModel>();
-                    services.AddSingleton<UsersViewModel>();
-
-                    // Register views
-                    services.AddTransient<MainWindow>();
-                    services.AddTransient<Home>();
-                    services.AddTransient<Settings>();
-                    services.AddTransient<Users>();
-
-                    // Register functions
-                    services.AddSingleton<Func<Type, BaseViewModel>>(serviceProvider => viewModelType => (BaseViewModel)serviceProvider.GetRequiredService(viewModelType));
+                    Register.AddDependencies(services);
+                    Register.AddWorkers(services);
                 }).Build();
+
+            _host.RunAsync();
         }
 
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Application.Startup" /> event.
+        /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.StartupEventArgs" /> that contains the event data.</param>
         protected override void OnStartup(StartupEventArgs e)
         {
             var mainWindow = _host.Services.GetRequiredService<MainWindow>();
@@ -54,6 +46,10 @@ namespace Wpf.Navigation
             mainWindow.Show();
         }
 
+        /// <summary>
+        /// Raises the <see cref="E:System.Windows.Application.Exit" /> event.
+        /// </summary>
+        /// <param name="e">A <see cref="T:System.Windows.ExitEventArgs" /> that contains the event data.</param>
         protected override async void OnExit(ExitEventArgs e)
         {
             await _host.StopAsync();

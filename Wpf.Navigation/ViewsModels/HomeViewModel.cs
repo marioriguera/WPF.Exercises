@@ -1,17 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Wpf.Navigation.Services;
+﻿using Wpf.Navigation.Services;
 
 namespace Wpf.Navigation.ViewsModels
 {
     public class HomeViewModel : BaseViewModel
     {
-        public HomeViewModel(INavigationService navigationService) 
+        private string _message;
+
+        public HomeViewModel(INavigationService navigationService)
             : base(navigationService)
         {
+        }
+
+        public string Message
+        {
+            get => _message;
+            set
+            {
+                _message = value;
+                NotifyPropertyChanged(nameof(Message));
+            }
+        }
+
+        internal void UpdateMessage(string messaje)
+        {
+            RunOnUiThread(() =>
+            {
+                Message = messaje;
+            });
         }
     }
 }

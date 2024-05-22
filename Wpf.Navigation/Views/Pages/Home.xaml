@@ -12,6 +12,9 @@
             <TextBlock Text="Home"
                        Foreground="Aqua"
                        FontSize="50"/>
+            <TextBlock Text="{Binding Message, IsAsync=True}"
+                       Foreground="Black"
+                       FontSize="25"/>
             <Button Content="Settings"
                     Height="20"
                     Command="{Binding SettingsNavigateCommand}"/>
